@@ -1,0 +1,120 @@
+import random, requests
+import string
+import smtplib
+from email.message import EmailMessage
+from django.contrib.auth.models import User
+
+
+def generate_random_password(length: int):
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choices(characters, k=length))
+
+def send_gmail(receiver_gmail: str, subject: str, message: str):
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login("ewebusinessewe@gmail.com", "qkyjfpyvwgokiwsl")
+        email = EmailMessage()
+        email['From'] = "Easy Way Earn"
+        email['To'] = receiver_gmail
+        email['Subject'] = subject
+        email.set_content(message)
+        server.send_message(email)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        server.quit()
+
+def generate_username():
+    """ Generates a unique username starting with 'EWE' followed by random digits. """
+    while True:
+        username = f"EWE{''.join(random.choices(string.digits, k=6))}"
+        if not User.objects.filter(username=username).exists():
+            return username
+
+def create_otp(digits:int):
+    return random.randint(10**(digits - 1), 10**digits - 1)
+
+
+API_URL = "https://mrobotics.in/api/recharge"
+API_TOKEN = "0c5b76e1-c06b-4a8f-a5cb-c7102d9ca11b"
+
+
+def create_order_id(digits:int):
+    return random.randint(10**(digits - 1), 10**digits - 1)
+
+def recharge_mobile(mobile_no, amount, company_name, order_id, is_stv=False):
+    company_ids = {
+        "vi": 1,
+        "airtel": 2,
+        "bsnl": 4,
+        "jio": 5
+    }
+    company_id = company_ids.get(company_name, None)
+    
+    data = {
+        "api_token": API_TOKEN,
+        "mobile_no": mobile_no,
+        "amount": amount,
+        "company_id": company_id,
+        "order_id": order_id,
+        "is_stv": str(is_stv).lower()
+    }
+    response = requests.post(API_URL, data=data)
+    
+    return response.json()
+
+'''
+def check_recharge_status(mobile_no, amount, company_name, order_id, is_stv=False):
+    company_ids = {
+        "Vodafone": 1,
+        "Airtel": 2,
+        "Idea": 3,
+        "Bsnl": 4,
+        "Jio": 5
+    }
+    company_id = company_ids.get(company_name, None)
+    if company_id is None:
+        return {"error": "Invalid company name"}
+    
+    url = (f"https://mrobotics.in/api/recharge_get?api_token={API_TOKEN}"
+           f"&mobile_no={mobile_no}&amount={amount}&company_id={company_id}"
+           f"&order_id={order_id}&is_stv={str(is_stv).lower()}")
+    response = requests.get(url)
+    return response.json()
+print( check_recharge_status("8393042166", "299", "Jio", "5813271") )
+'''
+
+def check_recharge_status(mobile_no, amount, company_name, order_id, is_stv=False):
+    company_ids = {
+        "Vodafone": 1,
+        "Airtel": 2,
+        "Idea": 3,
+        "Bsnl": 4,
+        "Jio": 5
+    }
+    
+    company_id = company_ids.get(company_name)
+    if company_id is None:
+        return {"error": "Invalid company name"}
+    
+    url = (f"https://mrobotics.in/api/recharge_get?api_token={API_TOKEN}"
+           f"&mobile_no={mobile_no}&amount={amount}&company_id={company_id}"
+           f"&order_id={order_id}&is_stv={str(bool(is_stv)).lower()}")
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raises an error for HTTP failure codes (4xx, 5xx)
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return {"error": "API request failed", "details": str(e)}
+
+
+
+"""
+{'lapu_no': '0690130333', 'balance': 726, 'roffer': 0, 'status': 'success', 'recharge_date': '2025-02-14T04:59:06.541Z', 'id': 5007096029, 'lapu_id': 2264721, 'user_id': 109093, 'company_id': 5, 'mobile_no': '8393042166', 'amount': 299, 'order_id': '5813271', 'ip_address': '49.36.222.253', 'updatedAt': '2025-02-14T04:59:14.700Z', 'createdAt': '2025-02-14T04:59:06.541Z', 'response': 'Success|2|||066318628214025100001|066318628214025500002|066318628214025900001||066318628214025100000', 'tnx_id': 'BR000BREHGY7'}
+
+{'lapu_no': '0690130333', 'balance': 605, 'roffer': 0, 'status': 'success', 'recharge_date': '2025-02-28T13:11:38.724Z', 'id': 5051673418, 'lapu_id': 2264721, 'user_id': 109093, 'company_id': 5, 'mobile_no': '7817889275', 'amount': 299, 'order_id': '5443255550', 'ip_address': '157.39.29.220', 'updatedAt': '2025-02-28T13:11:44.390Z', 'createdAt': '2025-02-28T13:11:38.724Z', 'response': 'Success|2|||066318628214025100001|066318628214025500005|066318628214025900001||066318628214025100000', 'tnx_id': 'BR000BT5DJIM'}
+
+{'lapu_no': '7500387276', 'balance': 563.12, 'roffer': 1.65775, 'status': 'success', 'recharge_date': '2025-02-28T14:09:42.335Z', 'id': 5051998330, 'lapu_id': 2278704, 'user_id': 109093, 'company_id': 2, 'mobile_no': '7500387276', 'amount': 349, 'order_id': '7414848943', 'ip_address': '157.39.28.179', 'updatedAt': '2025-02-28T14:09:44.424Z', 'createdAt': '2025-02-28T14:09:42.335Z', 'response': '{"responseMessage":"Recharge Successfully","transactionId":"1765213720","chillarAmount":"1.00","refTransactionNumber":"ROFFERb0513c858d5e467d","usimUpgradationMessage":"","gstText":""}', 'tnx_id': '1765213720'}
+"""                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
