@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - EWE MLM{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Page header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">My Profile</h1>
+        <p class="mt-2 text-gray-600">Manage your account information and settings</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Profile Information -->
+        <div class="lg:col-span-2">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Personal Information</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Username</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ user.username }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Mobile Number</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ member.mobile_no }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">First Name</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ user.first_name }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Last Name</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ user.last_name }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ user.email }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status</label>
+                            <span class="mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                {% if member.status == 'Active' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ member.status }}
+                            </span>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">Joined On</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ member.joined_on|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MLM Details -->
+            <div class="bg-white shadow rounded-lg mt-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">MLM Information</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Sponsor</label>
+                            <p class="mt-1 text-sm text-gray-900">
+                                {% if member.sponsor %}{{ member.sponsor.username }}{% else %}No Sponsor{% endif %}
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Head Member</label>
+                            <p class="mt-1 text-sm text-gray-900">
+                                {% if member.head_member %}{{ member.head_member.username }}{% else %}Root Member{% endif %}
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Position</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ member.position|default:"Root" }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Level</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ member.level }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Rank</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ member.rank_no }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Matching Pairs</label>
+                            <p class="mt-1 text-sm text-gray-900">{{ member.matching_pairs }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar with quick stats -->
+        <div class="lg:col-span-1">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Account Summary</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Account Balance:</span>
+                            <span class="text-sm font-medium text-green-600">₹{{ member.account_balance|floatformat:2 }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Wallet Balance:</span>
+                            <span class="text-sm font-medium text-blue-600">₹{{ member.wallet_balance|floatformat:2 }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Income:</span>
+                            <span class="text-sm font-medium text-green-600">₹{{ member.total_income|floatformat:2 }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Withdrawal:</span>
+                            <span class="text-sm font-medium text-red-600">₹{{ member.total_withdrawal|floatformat:2 }}</span>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="flex justify-between font-medium">
+                            <span class="text-sm">Net Balance:</span>
+                            <span class="text-sm text-green-600">₹{{ member.account_balance|add:member.wallet_balance|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Plans -->
+            <div class="bg-white shadow rounded-lg mt-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Active Plans</h3>
+                    
+                    {% if member.plans.exists %}
+                        {% for plan in member.plans.all %}
+                        <div class="border rounded-lg p-3 mb-3">
+                            <h4 class="font-medium">{{ plan.plan.name }}</h4>
+                            <p class="text-sm text-gray-600">₹{{ plan.plan.price }}</p>
+                            <p class="text-xs text-gray-500">Activated: {{ plan.activated_on|date:"M d, Y" }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-500 text-sm">No active plans</p>
+                        <a href="{% url 'select_plan' %}" class="mt-2 inline-block bg-primary text-white px-4 py-2 rounded text-sm hover:bg-secondary">
+                            Select Plan
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

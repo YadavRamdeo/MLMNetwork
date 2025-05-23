@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block title %}Genealogy - EWE MLM{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Page header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Genealogy Tree</h1>
+        <p class="mt-2 text-gray-600">View your team structure and downline members</p>
+    </div>
+
+    <!-- Tree visualization -->
+    <div class="bg-white shadow rounded-lg overflow-x-auto">
+        <div class="p-6">
+            <div id="tree-container" class="min-w-full">
+                <div class="flex flex-col items-center space-y-8">
+                    <!-- Root member (current user) -->
+                    <div class="tree-node root-node">
+                        <div class="bg-blue-500 text-white rounded-lg p-4 text-center min-w-32">
+                            <div class="font-bold">{{ tree_data.member.user.username }}</div>
+                            <div class="text-sm">{{ tree_data.member.user.first_name }} {{ tree_data.member.user.last_name }}</div>
+                            <div class="text-xs mt-1">
+                                <span class="bg-blue-400 px-2 py-1 rounded">{{ tree_data.member.status }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Level 1 -->
+                    {% if tree_data.left or tree_data.right %}
+                    <div class="flex justify-center space-x-32">
+                        <!-- Left side -->
+                        <div class="flex flex-col items-center">
+                            <div class="text-sm font-medium text-gray-600 mb-2">LEFT</div>
+                            {% if tree_data.left %}
+                                <div class="tree-node">
+                                    <div class="bg-green-500 text-white rounded-lg p-4 text-center min-w-32">
+                                        <div class="font-bold">{{ tree_data.left.member.user.username }}</div>
+                                        <div class="text-sm">{{ tree_data.left.member.user.first_name }} {{ tree_data.left.member.user.last_name }}</div>
+                                        <div class="text-xs mt-1">
+                                            <span class="bg-green-400 px-2 py-1 rounded">{{ tree_data.left.member.status }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="tree-node empty-node">
+                                    <div class="bg-gray-300 text-gray-600 rounded-lg p-4 text-center min-w-32 border-2 border-dashed">
+                                        <div class="text-sm">Empty Position</div>
+                                        <div class="text-xs">Available</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Right side -->
+                        <div class="flex flex-col items-center">
+                            <div class="text-sm font-medium text-gray-600 mb-2">RIGHT</div>
+                            {% if tree_data.right %}
+                                <div class="tree-node">
+                                    <div class="bg-purple-500 text-white rounded-lg p-4 text-center min-w-32">
+                                        <div class="font-bold">{{ tree_data.right.member.user.username }}</div>
+                                        <div class="text-sm">{{ tree_data.right.member.user.first_name }} {{ tree_data.right.member.user.last_name }}</div>
+                                        <div class="text-xs mt-1">
+                                            <span class="bg-purple-400 px-2 py-1 rounded">{{ tree_data.right.member.status }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="tree-node empty-node">
+                                    <div class="bg-gray-300 text-gray-600 rounded-lg p-4 text-center min-w-32 border-2 border-dashed">
+                                        <div class="text-sm">Empty Position</div>
+                                        <div class="text-xs">Available</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Level 2 -->
+                    {% if tree_data.left.left or tree_data.left.right or tree_data.right.left or tree_data.right.right %}
+                    <div class="flex justify-center space-x-16">
+                        <!-- Left branch level 2 -->
+                        <div class="flex space-x-8">
+                            {% if tree_data.left %}
+                                <!-- Left-Left -->
+                                <div class="flex flex-col items-center">
+                                    {% if tree_data.left.left %}
+                                        <div class="tree-node">
+                                            <div class="bg-green-400 text-white rounded-lg p-3 text-center min-w-24">
+                                                <div class="font-bold text-sm">{{ tree_data.left.left.member.user.username }}</div>
+                                                <div class="text-xs">{{ tree_data.left.left.member.user.first_name }}</div>
+                                                <div class="text-xs mt-1">
+                                                    <span class="bg-green-300 px-1 py-0.5 rounded text-xs">{{ tree_data.left.left.member.status }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="tree-node empty-node">
+                                            <div class="bg-gray-200 text-gray-500 rounded-lg p-3 text-center min-w-24 border border-dashed">
+                                                <div class="text-xs">Empty</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Left-Right -->
+                                <div class="flex flex-col items-center">
+                                    {% if tree_data.left.right %}
+                                        <div class="tree-node">
+                                            <div class="bg-green-400 text-white rounded-lg p-3 text-center min-w-24">
+                                                <div class="font-bold text-sm">{{ tree_data.left.right.member.user.username }}</div>
+                                                <div class="text-xs">{{ tree_data.left.right.member.user.first_name }}</div>
+                                                <div class="text-xs mt-1">
+                                                    <span class="bg-green-300 px-1 py-0.5 rounded text-xs">{{ tree_data.left.right.member.status }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="tree-node empty-node">
+                                            <div class="bg-gray-200 text-gray-500 rounded-lg p-3 text-center min-w-24 border border-dashed">
+                                                <div class="text-xs">Empty</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Right branch level 2 -->
+                        <div class="flex space-x-8">
+                            {% if tree_data.right %}
+                                <!-- Right-Left -->
+                                <div class="flex flex-col items-center">
+                                    {% if tree_data.right.left %}
+                                        <div class="tree-node">
+                                            <div class="bg-purple-400 text-white rounded-lg p-3 text-center min-w-24">
+                                                <div class="font-bold text-sm">{{ tree_data.right.left.member.user.username }}</div>
+                                                <div class="text-xs">{{ tree_data.right.left.member.user.first_name }}</div>
+                                                <div class="text-xs mt-1">
+                                                    <span class="bg-purple-300 px-1 py-0.5 rounded text-xs">{{ tree_data.right.left.member.status }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="tree-node empty-node">
+                                            <div class="bg-gray-200 text-gray-500 rounded-lg p-3 text-center min-w-24 border border-dashed">
+                                                <div class="text-xs">Empty</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Right-Right -->
+                                <div class="flex flex-col items-center">
+                                    {% if tree_data.right.right %}
+                                        <div class="tree-node">
+                                            <div class="bg-purple-400 text-white rounded-lg p-3 text-center min-w-24">
+                                                <div class="font-bold text-sm">{{ tree_data.right.right.member.user.username }}</div>
+                                                <div class="text-xs">{{ tree_data.right.right.member.user.first_name }}</div>
+                                                <div class="text-xs mt-1">
+                                                    <span class="bg-purple-300 px-1 py-0.5 rounded text-xs">{{ tree_data.right.right.member.status }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="tree-node empty-node">
+                                            <div class="bg-gray-200 text-gray-500 rounded-lg p-3 text-center min-w-24 border border-dashed">
+                                                <div class="text-xs">Empty</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team summary -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Left Team Summary</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Active Members:</span>
+                        <span class="text-sm font-medium text-green-600">{{ left_team.active }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Inactive Members:</span>
+                        <span class="text-sm font-medium text-red-600">{{ left_team.inactive }}</span>
+                    </div>
+                    <div class="flex justify-between font-medium">
+                        <span class="text-sm">Total Members:</span>
+                        <span class="text-sm">{{ left_team.total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Right Team Summary</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Active Members:</span>
+                        <span class="text-sm font-medium text-green-600">{{ right_team.active }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Inactive Members:</span>
+                        <span class="text-sm font-medium text-red-600">{{ right_team.inactive }}</span>
+                    </div>
+                    <div class="flex justify-between font-medium">
+                        <span class="text-sm">Total Members:</span>
+                        <span class="text-sm">{{ right_team.total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tree-node {
+    position: relative;
+}
+
+.tree-node::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background-color: #9CA3AF;
+    transform: translateX(-50%);
+}
+
+.root-node::before {
+    display: none;
+}
+</style>
+{% endblock %}

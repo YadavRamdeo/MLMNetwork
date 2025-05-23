@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Plan - EWE MLM{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Page header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Select Your Plan</h1>
+        <p class="mt-2 text-gray-600">Choose a plan to start your MLM journey and activate your account</p>
+    </div>
+
+    <!-- Current balance info -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-400"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Account Information</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <p>Your current account balance: <span class="font-bold">₹{{ member.account_balance|floatformat:2 }}</span></p>
+                    <p class="mt-1">Select a plan below to activate your account and start earning.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- Plans grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for plan in plans %}
+            <div class="relative">
+                <input type="radio" name="plan" value="{{ plan.id }}" id="plan_{{ plan.id }}" 
+                       class="sr-only peer" required>
+                <label for="plan_{{ plan.id }}" 
+                       class="block w-full cursor-pointer border-2 border-gray-200 rounded-lg p-6 hover:border-primary peer-checked:border-primary peer-checked:bg-primary peer-checked:bg-opacity-5 transition-all duration-200">
+                    
+                    <!-- Plan header -->
+                    <div class="text-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">{{ plan.name }}</h3>
+                        <div class="mt-2">
+                            <span class="text-3xl font-bold text-primary">₹{{ plan.price|floatformat:0 }}</span>
+                            <span class="text-gray-500">/one-time</span>
+                        </div>
+                    </div>
+
+                    <!-- Plan features -->
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Direct Commission: <strong>₹{{ plan.direct|floatformat:2 }}</strong></span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Matching Bonus: <strong>₹{{ plan.matching|floatformat:2 }}</strong></span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Binary Tree Placement</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Level Income Distribution</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Mobile Recharge Services</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Rank & Rewards System</span>
+                        </div>
+                    </div>
+
+                    <!-- Plan levels preview -->
+                    {% if plan.levels.exists %}
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">Level Distribution</h4>
+                        <div class="space-y-1">
+                            {% for level in plan.levels.all|slice:":3" %}
+                            <div class="flex justify-between text-xs text-gray-600">
+                                <span>Level {{ level.level }}:</span>
+                                <span>₹{{ level.distributed_amount|floatformat:2 }}</span>
+                            </div>
+                            {% endfor %}
+                            {% if plan.levels.count > 3 %}
+                            <div class="text-xs text-gray-500 text-center">
+                                +{{ plan.levels.count|add:"-3" }} more levels
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Affordability indicator -->
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        {% if member.account_balance >= plan.price %}
+                            <div class="flex items-center text-green-600">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span class="text-sm font-medium">Affordable</span>
+                            </div>
+                        {% else %}
+                            <div class="flex items-center text-red-600">
+                                <i class="fas fa-times-circle mr-2"></i>
+                                <span class="text-sm font-medium">Insufficient Balance</span>
+                                <span class="text-xs ml-2">(Need ₹{{ plan.price|sub:member.account_balance|floatformat:2 }} more)</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Selected indicator -->
+                    <div class="absolute top-4 right-4 opacity-0 peer-checked:opacity-100 transition-opacity">
+                        <div class="bg-primary text-white rounded-full p-1">
+                            <i class="fas fa-check text-sm"></i>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Plan comparison table -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Plan Comparison</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature</th>
+                                {% for plan in plans %}
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{ plan.name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Plan Price</td>
+                                {% for plan in plans %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-bold text-primary">₹{{ plan.price|floatformat:0 }}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Direct Commission</td>
+                                {% for plan in plans %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-green-600">₹{{ plan.direct|floatformat:2 }}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Matching Bonus</td>
+                                {% for plan in plans %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-purple-600">₹{{ plan.matching|floatformat:2 }}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Total Levels</td>
+                                {% for plan in plans %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-blue-600">{{ plan.levels.count }}</td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form errors -->
+        {% if form.errors %}
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Please correct the following errors:</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        {{ form.errors }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Submit section -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Ready to activate your plan?</h3>
+                        <p class="text-sm text-gray-500 mt-1">Choose a plan above and click activate to start your MLM journey.</p>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <a href="{% url 'dashboard' %}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            Cancel
+                        </a>
+                        
+                        <button type="submit" 
+                                class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Activate Plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Additional information -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-lightbulb text-green-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-green-800">How It Works</h3>
+                    <div class="mt-2 text-sm text-green-700">
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Select and activate a plan</li>
+                            <li>Start building your team</li>
+                            <li>Earn commissions on referrals</li>
+                            <li>Get matching bonuses from team pairs</li>
+                            <li>Advance through ranks for rewards</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-shield-alt text-blue-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Important Notes</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Plan activation is one-time only</li>
+                            <li>Amount will be deducted from account balance</li>
+                            <li>You can upgrade plans later</li>
+                            <li>All earnings are real-time</li>
+                            <li>Support available 24/7</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.peer:checked ~ label {
+    transform: scale(1.02);
+}
+</style>
+{% endblock %}

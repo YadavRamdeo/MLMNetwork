@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Income Report - EWE MLM{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Page header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Income Report</h1>
+        <p class="mt-2 text-gray-600">View your detailed income breakdown and history</p>
+    </div>
+
+    <!-- Income summary cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-hand-holding-usd text-2xl text-green-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Direct Income</dt>
+                            <dd class="text-lg font-medium text-gray-900">₹{{ member.direct_income|floatformat:2 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-layer-group text-2xl text-blue-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Level Income</dt>
+                            <dd class="text-lg font-medium text-gray-900">₹{{ member.level_income|floatformat:2 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-handshake text-2xl text-purple-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Matching Income</dt>
+                            <dd class="text-lg font-medium text-gray-900">₹{{ member.matching_income|floatformat:2 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-shopping-cart text-2xl text-orange-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Resale Income</dt>
+                            <dd class="text-lg font-medium text-gray-900">₹{{ member.resale_income|floatformat:2 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total income summary -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Income Summary</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600">₹{{ member.total_income|floatformat:2 }}</div>
+                    <div class="text-sm text-gray-500">Total Income</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-blue-600">₹{{ member.today_income|floatformat:2 }}</div>
+                    <div class="text-sm text-gray-500">Today's Income</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-purple-600">₹{{ member.account_balance|floatformat:2 }}</div>
+                    <div class="text-sm text-gray-500">Account Balance</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Income history table -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Income History</h3>
+            
+            {% if income_history %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Income Type
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Amount
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Description
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for income in income_history %}
+                        <tr class="{% cycle 'bg-white' 'bg-gray-50' %}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ income.created_at|date:"M d, Y H:i" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                    {% if income.income_type == 'direct_income' %}bg-green-100 text-green-800
+                                    {% elif income.income_type == 'level_income' %}bg-blue-100 text-blue-800
+                                    {% elif income.income_type == 'matching_income' %}bg-purple-100 text-purple-800
+                                    {% else %}bg-orange-100 text-orange-800{% endif %}">
+                                    {{ income.get_income_type_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                +₹{{ income.amount|floatformat:2 }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500">
+                                {{ income.description|default:"No description available" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination would go here if needed -->
+            {% if income_history|length >= 20 %}
+            <div class="mt-6 flex justify-center">
+                <span class="text-sm text-gray-500">Showing latest 20 transactions</span>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-chart-line text-4xl text-gray-300 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No Income History</h3>
+                <p class="text-gray-500">You haven't earned any income yet. Start building your team to earn commissions!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Income breakdown chart placeholder -->
+    <div class="bg-white shadow rounded-lg mt-8">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Income Breakdown</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% for income_type, income_display in income_by_type.items %}
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-lg font-semibold text-gray-900">₹{{ income_display|floatformat:2 }}</div>
+                    <div class="text-sm text-gray-500">{{ income_type|title|cut:"_" }} Income</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
