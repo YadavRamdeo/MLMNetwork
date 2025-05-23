@@ -157,7 +157,7 @@ class Member(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mlm_profile')
     profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
-    mobile_no = models.CharField(max_length=10, unique=True)
+    mobile_no = models.CharField(max_length=10, unique=True, null=True, blank=True)
     sponsor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='sponsored_users')
     head_member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='head_users')
     left = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='left_users')
@@ -340,8 +340,10 @@ class RechargeTransaction(models.Model):
 # Signal to create Member profile when User is created
 @receiver(post_save, sender=User)
 def create_member_profile(sender, instance, created, **kwargs):
-    if created:
-        Member.objects.create(user=instance)
+    if created and not hasattr(instance, '_skip_member_creation'):
+        # Only create member profile if it doesn't exist and user is not admin/staff
+        if not instance.is_staff and not Member.objects.filter(user=instance).exists():
+            Member.objects.create(user=instance, mobile_no='')
 
 # Signal to update matching income when a member plan is activated
 @receiver(post_save, sender=MemberPlan)
