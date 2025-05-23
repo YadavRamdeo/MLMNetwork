@@ -43,7 +43,19 @@ def register(request):
                     
                     # Create member profile
                     member = Member.objects.get(user=user)
-                    member.mobile_no = form.cleaned_data['mobile_no']
+                    mobile_no = form.cleaned_data['mobile_no']
+                    
+                    # Check if mobile number already exists
+                    if mobile_no and Member.objects.filter(mobile_no=mobile_no).exists():
+                        messages.error(request, 'This mobile number is already registered.')
+                        user.delete()  # Clean up the user if member creation fails
+                        return render(request, 'auth/register.html', {
+                            'form': form,
+                            'sponsor_from_url': sponsor_username,
+                            'position_from_url': position
+                        })
+                    
+                    member.mobile_no = mobile_no
                     
                     # Handle sponsor and position
                     sponsor_username = form.cleaned_data.get('sponsor_username') or request.POST.get('sponsor_from_url')
