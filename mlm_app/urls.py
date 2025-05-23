@@ -15,6 +15,7 @@ urlpatterns = [
     path('dashboard/genealogy/', views.genealogy, name='genealogy'),
     path('dashboard/income-report/', views.income_report, name='income_report'),
     path('dashboard/select-plan/', views.select_plan, name='select_plan'),
+    path('dashboard/referral-links/', views.referral_links, name='referral_links'),
     
     # Service URLs
     path('services/mobile-recharge/', views.initiate_recharge, name='mobile_recharge'),
