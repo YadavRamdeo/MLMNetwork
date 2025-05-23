@@ -26,6 +26,10 @@ def home(request):
 
 def register(request):
     """User registration view"""
+    # Get referral parameters from URL
+    sponsor_username = request.GET.get('sponsor')
+    position = request.GET.get('position', 'Left')  # Default to Left
+    
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -41,12 +45,20 @@ def register(request):
                     member = Member.objects.get(user=user)
                     member.mobile_no = form.cleaned_data['mobile_no']
                     
-                    # Handle sponsor
-                    sponsor_username = form.cleaned_data.get('sponsor_username')
+                    # Handle sponsor and position
+                    sponsor_username = form.cleaned_data.get('sponsor_username') or request.POST.get('sponsor_from_url')
+                    position = request.POST.get('position_from_url', 'Left')
+                    
                     if sponsor_username:
                         try:
                             sponsor = User.objects.get(username=sponsor_username)
                             member.sponsor = sponsor
+                            member.position = position
+                            
+                            # Place member in sponsor's tree
+                            sponsor_member = Member.objects.get(user=sponsor)
+                            sponsor_member.place_member(member, position)
+                            
                         except User.DoesNotExist:
                             messages.error(request, 'Invalid sponsor username')
                             return render(request, 'auth/register.html', {'form': form})
@@ -69,8 +81,15 @@ def register(request):
                 messages.error(request, f'Registration failed: {str(e)}')
     else:
         form = UserRegistrationForm()
+        # Pre-fill sponsor if coming from referral link
+        if sponsor_username:
+            form.fields['sponsor_username'].initial = sponsor_username
     
-    return render(request, 'auth/register.html', {'form': form})
+    return render(request, 'auth/register.html', {
+        'form': form,
+        'sponsor_from_url': sponsor_username,
+        'position_from_url': position
+    })
 
 @login_required
 def dashboard(request):
@@ -328,6 +347,27 @@ def admin_members(request):
     return render(request, 'admin/members.html', {'members': members})
 
 # API views for AJAX calls
+@login_required
+def referral_links(request):
+    """Generate referral links for left and right placement"""
+    try:
+        member = Member.objects.get(user=request.user)
+        base_url = request.build_absolute_uri('/auth/register/')
+        
+        # Generate referral links
+        left_link = f"{base_url}?sponsor={request.user.username}&position=Left"
+        right_link = f"{base_url}?sponsor={request.user.username}&position=Right"
+        
+        context = {
+            'member': member,
+            'left_referral_link': left_link,
+            'right_referral_link': right_link,
+        }
+        return render(request, 'dashboard/referral_links.html', context)
+    except Member.DoesNotExist:
+        messages.error(request, 'Member profile not found')
+        return redirect('dashboard')
+
 @login_required
 def api_member_search(request):
     """API endpoint for member search"""
