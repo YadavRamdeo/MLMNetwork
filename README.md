@@ -23,3 +23,13 @@ A web-based MLM management system designed to automate registration, genealogy t
 ---
 
 ## 📂 Folder Structure
+
+------------------some demo pic---------------------------
+![image](https://github.com/user-attachments/assets/b5a22b74-bfd4-449f-a4a5-67315206b6e3)
+![image](https://github.com/user-attachments/assets/382f3b1e-3b68-4d2b-8f63-ad3e7fcb6913)
+
+![image](https://github.com/user-attachments/assets/dcea50cb-1488-4385-8ed1-eaf656a88925)
+![image](https://github.com/user-attachments/assets/30c014d4-6b26-4c40-aafa-3bbf69f75785)
+
+
+
