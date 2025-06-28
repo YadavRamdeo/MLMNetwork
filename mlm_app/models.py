@@ -328,7 +328,7 @@ class RechargeTransaction(models.Model):
     company_name = models.CharField(max_length=50)
     order_id = models.CharField(max_length=20, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    response_data = models.JSONField(default=dict)
+    response_data = models.TextField()
     recharge_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

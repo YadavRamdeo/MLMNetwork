@@ -17,6 +17,7 @@ from .ewe_functions import (
     generate_username, generate_random_password, send_gmail,
     recharge_mobile, create_order_id
 )
+from mlm_app import models
 
 def home(request):
     """Home page view"""
@@ -81,7 +82,7 @@ def register(request):
                     try:
                         send_gmail(
                             user.email,
-                            'Welcome to EWE MLM Platform',
+                            'Welcome to Easy Money MLM Platform',
                             f'Welcome {user.first_name}! Your account has been created successfully. Username: {user.username}'
                         )
                     except Exception as e:
@@ -364,7 +365,7 @@ def referral_links(request):
     """Generate referral links for left and right placement"""
     try:
         member = Member.objects.get(user=request.user)
-        base_url = request.build_absolute_uri('/auth/register/')
+        base_url = request.build_absolute_uri('/referral/')
         
         # Generate referral links
         left_link = f"{base_url}?sponsor={request.user.username}&position=Left"

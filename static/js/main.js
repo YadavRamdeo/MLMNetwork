@@ -1,4 +1,4 @@
-// Main JavaScript file for EWE MLM Platform
+// Main JavaScript file for Easy Money Platform
 
 // Global variables
 let currentUser = null;
@@ -6,7 +6,7 @@ let notifications = [];
 let websocketConnection = null;
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeApp();
     initializeComponents();
     setupEventListeners();
@@ -15,17 +15,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize main application features
 function initializeApp() {
-    console.log('EWE MLM Platform Initialized');
-    
+    console.log('Easy Money Platform Initialized');
+
     // Setup CSRF token for AJAX requests
     setupCSRFToken();
-    
+
     // Initialize tooltips
     initializeTooltips();
-    
+
     // Setup auto-logout
     setupAutoLogout();
-    
+
     // Load theme preference
     loadThemePreference();
 }
@@ -35,10 +35,10 @@ function setupCSRFToken() {
     const token = document.querySelector('[name=csrfmiddlewaretoken]');
     if (token) {
         window.csrfToken = token.value;
-        
+
         // Set up AJAX defaults
         $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
+            beforeSend: function (xhr, settings) {
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
                     xhr.setRequestHeader("X-CSRFToken", window.csrfToken);
                 }
@@ -51,16 +51,16 @@ function setupCSRFToken() {
 function initializeComponents() {
     // Initialize dropdowns
     initializeDropdowns();
-    
+
     // Initialize modals
     initializeModals();
-    
+
     // Initialize charts
     initializeCharts();
-    
+
     // Initialize form validations
     initializeFormValidations();
-    
+
     // Initialize real-time updates
     initializeRealTimeUpdates();
 }
@@ -72,25 +72,25 @@ function setupEventListeners() {
     if (mobileMenuButton) {
         mobileMenuButton.addEventListener('click', toggleMobileMenu);
     }
-    
+
     // Search functionality
     const searchInputs = document.querySelectorAll('[data-search]');
     searchInputs.forEach(input => {
         input.addEventListener('input', debounce(handleSearch, 300));
     });
-    
+
     // Copy to clipboard functionality
     const copyButtons = document.querySelectorAll('[data-copy]');
     copyButtons.forEach(button => {
         button.addEventListener('click', copyToClipboard);
     });
-    
+
     // Form auto-save
     const autoSaveForms = document.querySelectorAll('[data-autosave]');
     autoSaveForms.forEach(form => {
         form.addEventListener('input', debounce(autoSaveForm, 1000));
     });
-    
+
     // Confirmation dialogs
     const confirmButtons = document.querySelectorAll('[data-confirm]');
     confirmButtons.forEach(button => {
@@ -100,18 +100,18 @@ function setupEventListeners() {
 
 // Dropdown functionality
 function initializeDropdowns() {
-    window.toggleDropdown = function() {
+    window.toggleDropdown = function () {
         const dropdown = document.getElementById('dropdown');
         if (dropdown) {
             dropdown.classList.toggle('hidden');
         }
     };
-    
+
     // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         const dropdown = document.getElementById('dropdown');
         const trigger = event.target.closest('[onclick*="toggleDropdown"]');
-        
+
         if (dropdown && !trigger && !dropdown.contains(event.target)) {
             dropdown.classList.add('hidden');
         }
@@ -121,12 +121,12 @@ function initializeDropdowns() {
 // Modal functionality
 function initializeModals() {
     // Generic modal functions
-    window.openModal = function(modalId) {
+    window.openModal = function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            
+
             // Focus management
             const firstFocusable = modal.querySelector('input, button, select, textarea, [tabindex]:not([tabindex="-1"])');
             if (firstFocusable) {
@@ -134,17 +134,17 @@ function initializeModals() {
             }
         }
     };
-    
-    window.closeModal = function(modalId) {
+
+    window.closeModal = function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.add('hidden');
             document.body.style.overflow = '';
         }
     };
-    
+
     // Close modal on ESC key
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             const openModals = document.querySelectorAll('.modal-overlay:not(.hidden)');
             openModals.forEach(modal => {
@@ -162,7 +162,7 @@ function initializeCharts() {
     if (incomeChartCanvas) {
         createIncomeChart(incomeChartCanvas);
     }
-    
+
     // Team growth chart
     const teamChartCanvas = document.getElementById('teamChart');
     if (teamChartCanvas) {
@@ -173,7 +173,7 @@ function initializeCharts() {
 // Create income chart
 function createIncomeChart(canvas) {
     const ctx = canvas.getContext('2d');
-    
+
     // Sample data - would be replaced with real data
     const data = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
@@ -185,7 +185,7 @@ function createIncomeChart(canvas) {
             tension: 0.4
         }]
     };
-    
+
     const config = {
         type: 'line',
         data: data,
@@ -200,7 +200,7 @@ function createIncomeChart(canvas) {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: function(value) {
+                        callback: function (value) {
                             return '₹' + value.toLocaleString();
                         }
                     }
@@ -208,14 +208,14 @@ function createIncomeChart(canvas) {
             }
         }
     };
-    
+
     new Chart(ctx, config);
 }
 
 // Create team growth chart
 function createTeamChart(canvas) {
     const ctx = canvas.getContext('2d');
-    
+
     const data = {
         labels: ['Left Team', 'Right Team'],
         datasets: [{
@@ -224,7 +224,7 @@ function createTeamChart(canvas) {
             borderWidth: 0
         }]
     };
-    
+
     const config = {
         type: 'doughnut',
         data: data,
@@ -237,26 +237,26 @@ function createTeamChart(canvas) {
             }
         }
     };
-    
+
     new Chart(ctx, config);
 }
 
 // Form validation
 function initializeFormValidations() {
     const forms = document.querySelectorAll('form[data-validate]');
-    
+
     forms.forEach(form => {
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', function (event) {
             if (!validateForm(form)) {
                 event.preventDefault();
                 return false;
             }
         });
-        
+
         // Real-time validation
         const inputs = form.querySelectorAll('input, select, textarea');
         inputs.forEach(input => {
-            input.addEventListener('blur', function() {
+            input.addEventListener('blur', function () {
                 validateField(input);
             });
         });
@@ -267,13 +267,13 @@ function initializeFormValidations() {
 function validateForm(form) {
     let isValid = true;
     const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-    
+
     inputs.forEach(input => {
         if (!validateField(input)) {
             isValid = false;
         }
     });
-    
+
     return isValid;
 }
 
@@ -282,13 +282,13 @@ function validateField(field) {
     const value = field.value.trim();
     let isValid = true;
     let errorMessage = '';
-    
+
     // Required validation
     if (field.hasAttribute('required') && !value) {
         isValid = false;
         errorMessage = 'This field is required';
     }
-    
+
     // Email validation
     if (field.type === 'email' && value) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -297,7 +297,7 @@ function validateField(field) {
             errorMessage = 'Please enter a valid email address';
         }
     }
-    
+
     // Phone validation
     if (field.name === 'mobile_no' && value) {
         const phoneRegex = /^[6-9]\d{9}$/;
@@ -306,7 +306,7 @@ function validateField(field) {
             errorMessage = 'Please enter a valid 10-digit mobile number';
         }
     }
-    
+
     // Password validation
     if (field.type === 'password' && value) {
         if (value.length < 8) {
@@ -314,29 +314,29 @@ function validateField(field) {
             errorMessage = 'Password must be at least 8 characters long';
         }
     }
-    
+
     // Update field appearance
     updateFieldValidation(field, isValid, errorMessage);
-    
+
     return isValid;
 }
 
 // Update field validation appearance
 function updateFieldValidation(field, isValid, errorMessage) {
     const fieldGroup = field.closest('.form-group') || field.parentElement;
-    
+
     // Remove existing validation classes
     field.classList.remove('field-success', 'field-error');
-    
+
     // Remove existing error message
     const existingError = fieldGroup.querySelector('.field-error-message');
     if (existingError) {
         existingError.remove();
     }
-    
+
     if (!isValid) {
         field.classList.add('field-error');
-        
+
         // Add error message
         const errorElement = document.createElement('div');
         errorElement.className = 'field-error-message text-red-600 text-sm mt-1';
@@ -353,7 +353,7 @@ function initializeRealTimeUpdates() {
     if (document.querySelector('[data-balance]')) {
         setInterval(updateBalances, 30000);
     }
-    
+
     // Update notifications every 60 seconds
     setInterval(updateNotifications, 60000);
 }
@@ -400,7 +400,7 @@ function updateNotifications() {
 function displayNotifications(notifications) {
     const container = document.getElementById('notifications-container');
     if (!container) return;
-    
+
     notifications.forEach(notification => {
         showNotification(notification.message, notification.type);
     });
@@ -410,14 +410,14 @@ function displayNotifications(notifications) {
 function showNotification(message, type = 'info', duration = 5000) {
     const notification = document.createElement('div');
     notification.className = `fixed top-4 right-4 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 z-50 transform transition-all duration-300 translate-x-full`;
-    
+
     const bgColor = {
         'success': 'bg-green-50 border-green-400 text-green-800',
         'error': 'bg-red-50 border-red-400 text-red-800',
         'warning': 'bg-yellow-50 border-yellow-400 text-yellow-800',
         'info': 'bg-blue-50 border-blue-400 text-blue-800'
     }[type] || 'bg-blue-50 border-blue-400 text-blue-800';
-    
+
     notification.innerHTML = `
         <div class="p-4 ${bgColor} border-l-4 rounded">
             <div class="flex items-center">
@@ -430,14 +430,14 @@ function showNotification(message, type = 'info', duration = 5000) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Animate in
     setTimeout(() => {
         notification.classList.remove('translate-x-full');
     }, 100);
-    
+
     // Auto remove
     if (duration > 0) {
         setTimeout(() => {
@@ -463,7 +463,7 @@ function toggleMobileMenu() {
 function handleSearch(event) {
     const query = event.target.value.toLowerCase();
     const searchType = event.target.dataset.search;
-    
+
     if (searchType === 'members') {
         searchMembers(query);
     } else if (searchType === 'transactions') {
@@ -474,7 +474,7 @@ function handleSearch(event) {
 // Search members
 function searchMembers(query) {
     const memberRows = document.querySelectorAll('[data-member-row]');
-    
+
     memberRows.forEach(row => {
         const memberData = row.textContent.toLowerCase();
         if (memberData.includes(query)) {
@@ -488,7 +488,7 @@ function searchMembers(query) {
 // Search transactions
 function searchTransactions(query) {
     const transactionRows = document.querySelectorAll('[data-transaction-row]');
-    
+
     transactionRows.forEach(row => {
         const transactionData = row.textContent.toLowerCase();
         if (transactionData.includes(query)) {
@@ -503,7 +503,7 @@ function searchTransactions(query) {
 function copyToClipboard(event) {
     const target = event.target.closest('[data-copy]');
     const text = target.dataset.copy || target.textContent;
-    
+
     navigator.clipboard.writeText(text).then(() => {
         showNotification('Copied to clipboard!', 'success', 2000);
     }).catch(() => {
@@ -522,14 +522,14 @@ function copyToClipboard(event) {
 function autoSaveForm(event) {
     const form = event.target.closest('form');
     if (!form) return;
-    
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData);
-    
+
     // Save to localStorage
     const formId = form.id || 'auto-save-form';
     localStorage.setItem(`autosave_${formId}`, JSON.stringify(data));
-    
+
     // Show save indicator
     showSaveIndicator(form);
 }
@@ -543,7 +543,7 @@ function showSaveIndicator(form) {
         indicator.textContent = 'Auto-saved';
         form.appendChild(indicator);
     }
-    
+
     indicator.style.display = 'block';
     setTimeout(() => {
         indicator.style.display = 'none';
@@ -554,7 +554,7 @@ function showSaveIndicator(form) {
 function handleConfirmAction(event) {
     const target = event.target.closest('[data-confirm]');
     const message = target.dataset.confirm || 'Are you sure?';
-    
+
     if (!confirm(message)) {
         event.preventDefault();
         return false;
@@ -576,7 +576,7 @@ function loadUserData() {
 // Initialize tooltips
 function initializeTooltips() {
     const tooltipElements = document.querySelectorAll('[data-tooltip]');
-    
+
     tooltipElements.forEach(element => {
         element.addEventListener('mouseenter', showTooltip);
         element.addEventListener('mouseleave', hideTooltip);
@@ -587,13 +587,13 @@ function initializeTooltips() {
 function showTooltip(event) {
     const element = event.target;
     const text = element.dataset.tooltip;
-    
+
     const tooltip = document.createElement('div');
     tooltip.className = 'absolute bg-gray-800 text-white px-2 py-1 rounded text-xs z-50 tooltip';
     tooltip.textContent = text;
-    
+
     document.body.appendChild(tooltip);
-    
+
     const rect = element.getBoundingClientRect();
     tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2}px`;
     tooltip.style.top = `${rect.top - tooltip.offsetHeight - 5}px`;
@@ -609,7 +609,7 @@ function hideTooltip() {
 function setupAutoLogout() {
     let logoutTimer;
     const timeout = 30 * 60 * 1000; // 30 minutes
-    
+
     function resetTimer() {
         clearTimeout(logoutTimer);
         logoutTimer = setTimeout(() => {
@@ -620,14 +620,14 @@ function setupAutoLogout() {
             }
         }, timeout);
     }
-    
+
     // Reset timer on user activity
     document.addEventListener('mousedown', resetTimer);
     document.addEventListener('mousemove', resetTimer);
     document.addEventListener('keypress', resetTimer);
     document.addEventListener('scroll', resetTimer);
     document.addEventListener('touchstart', resetTimer);
-    
+
     resetTimer();
 }
 
@@ -666,7 +666,7 @@ function debounce(func, wait) {
 
 function throttle(func, limit) {
     let inThrottle;
-    return function() {
+    return function () {
         const args = arguments;
         const context = this;
         if (!inThrottle) {
@@ -722,4 +722,4 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-console.log('EWE MLM Platform JavaScript loaded successfully');
+console.log('Easy Money Platform JavaScript loaded successfully');
